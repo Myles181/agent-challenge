@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useTheme, ThemeSwitcher } from './theme-engine';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './hero.module.css';
@@ -30,25 +31,60 @@ import {
 
 const Logo = () => (
   <div className="flex items-center gap-3 group cursor-pointer">
-    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-2xl shadow-red-950/50 border border-red-500/30 group-hover:border-red-400 group-hover:shadow-red-500/40 transition-all duration-500">
+    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--theme-primary)] to-[var(--theme-primary)] flex items-center justify-center shadow-2xl shadow-[rgba(var(--theme-primary-rgb),0.50)] border border-[rgba(var(--theme-primary-rgb),0.30)] group-hover:border-[var(--theme-primary)] group-hover:shadow-[rgba(var(--theme-primary-rgb),0.40)] transition-all duration-500">
       <div className="w-6 h-3 bg-white/40 rounded-full group-hover:scale-110 transition-transform" />
     </div>
-    <span className="font-extrabold text-3xl tracking-tighter text-white">IQ-5<span className="text-red-600">AI</span></span>
+    <span className="font-extrabold text-3xl tracking-tighter text-white">IQ-5<span className="text-[var(--theme-primary)]">AI</span></span>
   </div>
 );
 
-const Nav = () => (
-  <nav className={styles.navWrapper}>
-    <a href="#features" className={styles.navItem}>Features</a>
-    <a href="#use-cases" className={styles.navItem}>Solutions</a>
-    <a href="#integrations" className={styles.navItem}>Integrations</a>
-    <a href="#faq" className={styles.navItem}>FAQ</a>
-    <a href="#" className={styles.navItemActive}>
-      <Sparkles className="w-3 h-3 inline mr-1" />
-      Protocol Hub
-    </a>
-  </nav>
-);
+const NAV_ITEMS = [
+  { id: 'features', label: 'Features', href: '#features' },
+  { id: 'solutions', label: 'Solutions', href: '#use-cases' },
+  { id: 'integrations', label: 'Integrations', href: '#integrations' },
+  { id: 'faq', label: 'FAQ', href: '#faq' },
+];
+
+const Nav = () => {
+  const [hovered, setHovered] = useState<string | null>(null);
+  
+  return (
+    <motion.nav 
+       initial={{ y: -100, opacity: 0, x: "-50%" }}
+       animate={{ y: 0, opacity: 1, x: "-50%" }}
+       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+       className={styles.navWrapper}
+    >
+       <div className={styles.navGroup} onMouseLeave={() => setHovered(null)}>
+          {NAV_ITEMS.map(item => (
+            <a 
+              key={item.id}
+              href={item.href}
+              className={styles.navItem}
+              onMouseEnter={() => setHovered(item.id)}
+            >
+              {hovered === item.id && (
+                <motion.div
+                  layoutId="navHover"
+                  className={styles.navHoverBackground}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{item.label}</span>
+            </a>
+          ))}
+       </div>
+       <div className="w-[1px] h-6 bg-white/10 mx-2" />
+       <a href="#" className={styles.navItemActive}>
+         <Sparkles className="w-3 h-3 inline mr-1" />
+         Protocol Hub
+       </a>
+    </motion.nav>
+  );
+};
 
 const FeatureCard = ({ icon, title, text }: { icon: React.ReactNode, title: string, text: string }) => (
   <div className={styles.featureCard}>
@@ -114,7 +150,7 @@ const WalletModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             </div>
             
             <div className="mt-8 pt-8 border-t border-zinc-900 text-center">
-              <p className="text-zinc-600 text-sm">New to Solana? <a href="#" className="text-red-600 font-bold">Learn more</a></p>
+              <p className="text-zinc-600 text-sm">New to Solana? <a href="#" className="text-[var(--theme-primary)] font-bold">Learn more</a></p>
             </div>
           </motion.div>
         </motion.div>
@@ -150,8 +186,8 @@ const Visualization = () => {
         
         <defs>
           <radialGradient id="coreGradient">
-            <stop offset="0%" stopColor="#ff0000" />
-            <stop offset="100%" stopColor="#550000" />
+            <stop offset="0%" stopColor="var(--theme-primary)" />
+            <stop offset="100%" stopColor="var(--theme-primary)" />
           </radialGradient>
         </defs>
 
@@ -181,7 +217,7 @@ const Visualization = () => {
       </div>
       
       <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-500px, 100px)' }}>
-          <div className={styles.statusPill} style={{borderColor: 'rgba(220,38,38,0.2)'}}>
+          <div className={styles.statusPill} style={{borderColor: 'rgba(var(--theme-primary-rgb), 0.2)'}}>
             <span className="flex items-center gap-3">
                <div className="w-2 h-2 rounded-full bg-blue-500" />
                Nosana Grid Active
@@ -190,9 +226,9 @@ const Visualization = () => {
       </div>
 
       <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(420px, -220px)' }}>
-          <div className={styles.statusPill} style={{borderColor: 'rgba(220,38,38,0.2)'}}>
+          <div className={styles.statusPill} style={{borderColor: 'rgba(var(--theme-primary-rgb), 0.2)'}}>
             <span className="flex items-center gap-3">
-               <Activity className="w-4 h-4 text-red-600" />
+               <Activity className="w-4 h-4 text-[var(--theme-primary)]" />
                4.2k TX/sec
             </span>
           </div>
@@ -203,9 +239,21 @@ const Visualization = () => {
 
 export default function HomePage() {
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const { activeTheme, selectTheme } = useTheme();
 
   return (
-    <div className={styles.heroContainer}>
+    <div className={styles.heroContainer} style={{
+      "--theme-primary": activeTheme.primary,
+      "--theme-primary-rgb": activeTheme.primaryRgb,
+      "--theme-glow": activeTheme.glow,
+      "--theme-appBg": activeTheme.appBg,
+      "--theme-panelBg": activeTheme.panelBg,
+      "--theme-textMain": activeTheme.textMain,
+      "--theme-textMuted": activeTheme.textMuted,
+      "--theme-border": activeTheme.border,
+      color: activeTheme.textMain,
+    } as React.CSSProperties}>
+    <ThemeSwitcher activeTheme={activeTheme} selectTheme={selectTheme} />
       <header className="fixed top-0 left-0 right-0 px-12 py-8 flex justify-between items-center z-50">
         <Logo />
         <div className={styles.authButtons}>
@@ -220,7 +268,7 @@ export default function HomePage() {
       <main className={styles.mainContent}>
         <div className={styles.floatAnimation}>
            <div className={styles.dashboardBadge}>
-              <span className="w-3 h-3 bg-red-600 rounded-full animate-ping mr-3" />
+              <span className="w-3 h-3 bg-[var(--theme-primary)] rounded-full animate-ping mr-3" />
               {/* Pulse Ingress Active */}
            </div>
 
@@ -234,12 +282,12 @@ export default function HomePage() {
            </p>
 
            <div className="flex justify-center gap-4 mb-16">
-             <button className={styles.primaryButton} onClick={() => setIsWalletOpen(true)}>
+             {/* <button className={styles.primaryButton} onClick={() => setIsWalletOpen(true)}>
                 <Rocket className="w-5 h-5 inline mr-2" />
                 Initialize IQ-5 Protocol
-             </button>
-             <div className="px-6 py-2 rounded-full border border-zinc-800 text-zinc-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2">
-               <Activity className="w-4 h-4 text-red-600" /> Orbital Mode
+             </button> */}
+             <div className={styles.magicButton} onClick={() => setIsWalletOpen(true)}>
+               <Activity className="w-4 h-4 text-[var(--theme-primary)]" /> Orbital Mode
              </div>
            </div>
         </div>
@@ -257,7 +305,7 @@ export default function HomePage() {
 
       <section id="features" className={styles.sectionWrapper}>
         <div className="mb-24">
-          <span className="text-red-500 font-bold tracking-[0.2em] text-xs uppercase mb-6 block">Sub-Second Vigilance</span>
+          <span className="text-[var(--theme-primary)] font-bold tracking-[0.2em] text-xs uppercase mb-6 block">Sub-Second Vigilance</span>
           <h2 className="text-7xl font-black mb-8 tracking-tighter">Vigilance. Automation. Results.</h2>
           <p className="text-zinc-500 max-w-3xl mx-auto text-xl leading-relaxed font-medium">
             Stop drowning in chain noise. IQ-5 AI filters every transaction through ElizaOS logic to deliver the pure alpha you need to lead the market.
@@ -266,17 +314,17 @@ export default function HomePage() {
         
         <div className={styles.featuresGrid}>
           <FeatureCard 
-            icon={<Radio className="w-8 h-8 text-red-600" />}
+            icon={<Radio className="w-8 h-8 text-[var(--theme-primary)]" />}
             title="Satellite Scan"
             text="Distributed RPCB monitoring across all major chains. We catch liquidity migrations before they hit the DEX feeders."
           />
           <FeatureCard 
-            icon={<Satellite className="w-8 h-8 text-red-600" />}
+            icon={<Satellite className="w-8 h-8 text-[var(--theme-primary)]" />}
             title="Auto-X Engine"
             text="Your AI agent owns the social narrative. Custom-logic broadcasting that grows your trader network while you sleep."
           />
           <FeatureCard 
-            icon={<Cpu className="w-8 h-8 text-red-600" />}
+            icon={<Cpu className="w-8 h-8 text-[var(--theme-primary)]" />}
             title="Nosana Compute"
             text="The first agent protocol to run on decentralized GPUs. High-performance inference with zero-downtime reliability."
           />
@@ -284,13 +332,13 @@ export default function HomePage() {
       </section>
 
       <section id="use-cases" className={styles.sectionWrapper}>
-        <div className="grid md:grid-cols-2 gap-16 items-center bg-zinc-900/40 p-20 rounded-[5rem] border border-zinc-800 text-left relative overflow-hidden group hover:border-red-600/20 transition-all duration-700">
+        <div className="grid md:grid-cols-2 gap-16 items-center bg-zinc-900/40 p-20 rounded-[5rem] border border-zinc-800 text-left relative overflow-hidden group hover:border-[rgba(var(--theme-primary-rgb),0.20)] transition-all duration-700">
            <div className="relative z-10">
               <h2 className="text-6xl font-black mb-10 tracking-tighter">The Alpha Scenarios.</h2>
               <div className="space-y-12">
                  <div className="flex gap-8 group/item">
-                    <div className="p-4 rounded-xl bg-red-600/10 border border-red-500/20 group-hover/item:bg-red-600/20 transition-all">
-                       <TrendingUp className="w-8 h-8 text-red-600" />
+                    <div className="p-4 rounded-xl bg-[rgba(var(--theme-primary-rgb),0.10)] border border-[rgba(var(--theme-primary-rgb),0.20)] group-hover/item:bg-[rgba(var(--theme-primary-rgb),0.20)] transition-all">
+                       <TrendingUp className="w-8 h-8 text-[var(--theme-primary)]" />
                     </div>
                     <div>
                        <h4 className="text-2xl font-black mb-3">Liquidity Injection Tracking</h4>
@@ -298,8 +346,8 @@ export default function HomePage() {
                     </div>
                  </div>
                  <div className="flex gap-8 group/item">
-                    <div className="p-4 rounded-xl bg-red-600/10 border border-red-500/20 group-hover/item:bg-red-600/20 transition-all">
-                       <Building2 className="w-8 h-8 text-red-600" />
+                    <div className="p-4 rounded-xl bg-[rgba(var(--theme-primary-rgb),0.10)] border border-[rgba(var(--theme-primary-rgb),0.20)] group-hover/item:bg-[rgba(var(--theme-primary-rgb),0.20)] transition-all">
+                       <Building2 className="w-8 h-8 text-[var(--theme-primary)]" />
                     </div>
                     <div>
                        <h4 className="text-2xl font-black mb-3">Institutional Flow Alerts</h4>
@@ -307,8 +355,8 @@ export default function HomePage() {
                     </div>
                  </div>
                  <div className="flex gap-8 group/item">
-                    <div className="p-4 rounded-xl bg-red-600/10 border border-red-500/20 group-hover/item:bg-red-600/20 transition-all">
-                       <Brain className="w-8 h-8 text-red-600" />
+                    <div className="p-4 rounded-xl bg-[rgba(var(--theme-primary-rgb),0.10)] border border-[rgba(var(--theme-primary-rgb),0.20)] group-hover/item:bg-[rgba(var(--theme-primary-rgb),0.20)] transition-all">
+                       <Brain className="w-8 h-8 text-[var(--theme-primary)]" />
                     </div>
                     <div>
                        <h4 className="text-2xl font-black mb-3">Smart Money Mimicry</h4>
@@ -318,13 +366,13 @@ export default function HomePage() {
               </div>
            </div>
            <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-red-600/5 to-red-900/5 rounded-3xl border border-red-500/10 flex items-center justify-center p-12">
-                 <div className="w-full h-full border border-dashed border-red-500/20 rounded-full animate-[spin_60s_linear_infinite] flex items-center justify-center">
-                    <div className="w-1/2 h-1/2 bg-red-600/10 rounded-full blur-3xl animate-pulse" />
+              <div className="aspect-square bg-gradient-to-br from-[rgba(var(--theme-primary-rgb),0.5)] to-[rgba(var(--theme-primary-rgb),0.5)] rounded-3xl border border-[rgba(var(--theme-primary-rgb),0.10)] flex items-center justify-center p-12">
+                 <div className="w-full h-full border border-dashed border-[rgba(var(--theme-primary-rgb),0.20)] rounded-full animate-[spin_60s_linear_infinite] flex items-center justify-center">
+                    <div className="w-1/2 h-1/2 bg-[rgba(var(--theme-primary-rgb),0.10)] rounded-full blur-3xl animate-pulse" />
                  </div>
               </div>
            </div>
-           <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-radial-gradient from-red-600/5 to-transparent pointer-events-none" />
+           <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-radial-gradient from-[rgba(var(--theme-primary-rgb),0.5)] to-transparent pointer-events-none" />
         </div>
       </section>
 
@@ -332,7 +380,7 @@ export default function HomePage() {
         <h2 className="text-6xl font-black mb-16 tracking-tight">Ecosystem Synergy.</h2>
         <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
            {['X / TWITTER', 'DISCORD', 'TELEGRAM', 'SLACK', 'POSTGRES', 'WEBSOCKET', 'NOSANA CLOUD', 'ELIZAOS V2'].map(item => (
-             <div key={item} className="px-10 py-5 rounded-2xl bg-zinc-900/30 border border-zinc-800/50 font-bold tracking-widest text-zinc-500 hover:text-red-500 hover:border-red-600/30 hover:bg-red-600/5 transition-all cursor-crosshair">
+             <div key={item} className="px-10 py-5 rounded-2xl bg-zinc-900/30 border border-zinc-800/50 font-bold tracking-widest text-zinc-500 hover:text-[var(--theme-primary)] hover:border-[rgba(var(--theme-primary-rgb),0.30)] hover:bg-[var(--theme-primary)]/5 transition-all cursor-crosshair">
                {item}
              </div>
            ))}
@@ -343,15 +391,15 @@ export default function HomePage() {
         <h2 className="text-6xl font-black mb-20 tracking-tighter text-center">Intelligence FAQ.</h2>
         <div className="max-w-4xl mx-auto space-y-8">
            <div className={styles.faqItem}>
-              <div className={styles.faqQuestion}>How does IQ-5 achieve sub-second latency? <ArrowRight className="w-5 h-5 text-red-600" /></div>
+              <div className={styles.faqQuestion}>How does IQ-5 achieve sub-second latency? <ArrowRight className="w-5 h-5 text-[var(--theme-primary)]" /></div>
               <p className={styles.faqAnswer}>By utilizing Nosana's distributed GPU network, we colocate our ElizaOS agents with the highest-reliability RPC nodes on every major chain.</p>
            </div>
            <div className={styles.faqItem}>
-              <div className={styles.faqQuestion}>Can I customize the Auto-X broadcast logic? <ArrowRight className="w-5 h-5 text-red-600" /></div>
+              <div className={styles.faqQuestion}>Can I customize the Auto-X broadcast logic? <ArrowRight className="w-5 h-5 text-[var(--theme-primary)]" /></div>
               <p className={styles.faqAnswer}>Absolutely. You have full control over the IQ-5 filters, allowing you to define exactly what constitutes a "broadcastable" event based on volume, frequency, and sentiment.</p>
            </div>
            <div className={styles.faqItem}>
-              <div className={styles.faqQuestion}>Is my monitoring encrypted? <ArrowRight className="w-5 h-5 text-red-600" /></div>
+              <div className={styles.faqQuestion}>Is my monitoring encrypted? <ArrowRight className="w-5 h-5 text-[var(--theme-primary)]" /></div>
               <p className={styles.faqAnswer}>Yes. Your agent logic and specific wallet lists are never exposed to centralized servers. Your intelligence remains yours.</p>
            </div>
         </div>
@@ -367,7 +415,7 @@ export default function HomePage() {
              {[...Array(5)].map((_, i) => (
                 <img key={i} className="w-14 h-14 rounded-full border-4 border-[#000103] shadow-lg" src={`https://ui-avatars.com/api/?name=${i}&background=333&color=fff`} />
              ))}
-             <div className="w-14 h-14 rounded-full border-4 border-[#000103] bg-red-600 flex items-center justify-center font-extrabold text-xs ring-4 ring-red-600/20 ring-offset-4 ring-offset-zinc-950">
+             <div className="w-14 h-14 rounded-full border-4 border-[#000103] bg-[var(--theme-primary)] flex items-center justify-center font-extrabold text-xs ring-4 ring-[rgba(var(--theme-primary-rgb),0.20)] ring-offset-4 ring-offset-zinc-950">
                +1.2k
              </div>
           </div>
@@ -416,16 +464,16 @@ export default function HomePage() {
         <div className="max-w-[1200px] mx-auto mt-24 pt-10 border-t border-zinc-900 text-zinc-700 flex justify-between items-center text-sm font-medium tracking-wide">
            <div>© 2026 IQ-5 PROTOCOL. CRYPTOGRAPHICALLY SECURED.</div>
            <div className="flex gap-12">
-              <a href="#" className="hover:text-red-500 transition-colors">PRIVACY_PROTOCOL</a>
-              <a href="#" className="hover:text-red-500 transition-colors">SERVICE_LEVEL_AGREEMENT</a>
+              <a href="#" className="hover:text-[var(--theme-primary)] transition-colors">PRIVACY_PROTOCOL</a>
+              <a href="#" className="hover:text-[var(--theme-primary)] transition-colors">SERVICE_LEVEL_AGREEMENT</a>
            </div>
         </div>
       </footer>
 
       {/* Extreme Glowing backgrounds */}
-      <div style={{ position: 'absolute', left: '-10%', top: '5%', width: '1000px', height: '1000px', background: 'radial-gradient(circle, rgba(220, 38, 38, 0.04) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
-      <div style={{ position: 'absolute', right: '-15%', top: '40%', width: '1000px', height: '1000px', background: 'radial-gradient(circle, rgba(220, 38, 38, 0.06) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
-      <div style={{ position: 'absolute', left: '20%', bottom: '-10%', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(220, 38, 38, 0.03) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
+      <div style={{ position: 'absolute', left: '-10%', top: '5%', width: '1000px', height: '1000px', background: 'radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.04) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
+      <div style={{ position: 'absolute', right: '-15%', top: '40%', width: '1000px', height: '1000px', background: 'radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.06) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
+      <div style={{ position: 'absolute', left: '20%', bottom: '-10%', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.03) 0%, transparent 70%)', filter: 'blur(120px)' }} className="pointer-events-none" />
 
       <WalletModal isOpen={isWalletOpen} onClose={() => setIsWalletOpen(false)} />
     </div>

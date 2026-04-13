@@ -1,0 +1,198 @@
+
+<style>
+.wrap { display: flex; justify-content: center; align-items: center; height: 340px; }
+</style>
+<div class="wrap">
+  <canvas id="c" width="340" height="340"></canvas>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 340, H = 340, cx = 170, cy = 170;
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+const COL = {
+  node: isDark ? 'rgba(174,169,236,1)' : 'rgba(83,74,183,1)',
+  nodeGlow: isDark ? 'rgba(174,169,236,0.25)' : 'rgba(83,74,183,0.15)',
+  line: isDark ? 'rgba(93,202,165,VAL)' : 'rgba(29,158,117,VAL)',
+  pulse: isDark ? 'rgba(255,255,255,VAL)' : 'rgba(83,74,183,VAL)',
+  center: isDark ? 'rgba(127,119,221,0.18)' : 'rgba(127,119,221,0.12)',
+};
+
+const N = 14;
+let t = 0;
+
+const nodes = Array.from({length: N}, (_, i) => {
+  const angle = (i / N) * Math.PI * 2;
+  const r = 100 + (Math.random() - 0.5) * 40;
+  return {
+    baseAngle: angle,
+    r,
+    speed: 0.003 + Math.random() * 0.004,
+    phase: Math.random() * Math.PI * 2,
+    rPhase: Math.random() * Math.PI * 2,
+    size: 2.5 + Math.random() * 2,
+  };
+});
+
+// inner ring
+const innerNodes = Array.from({length: 6}, (_, i) => {
+  const angle = (i / 6) * Math.PI * 2;
+  return {
+    baseAngle: angle,
+    r: 48,
+    speed: 0.006 + Math.random() * 0.003,
+    phase: Math.random() * Math.PI * 2,
+    rPhase: Math.random() * Math.PI * 2,
+    size: 2 + Math.random(),
+  };
+});
+
+const pulses = [];
+let pulseTimer = 0;
+
+function nodePos(n, time) {
+  const a = n.baseAngle + Math.sin(time * n.speed * 60 + n.phase) * 0.25;
+  const r = n.r + Math.sin(time * 0.8 + n.rPhase) * 14;
+  return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+}
+
+function dist(a, b) {
+  return Math.hypot(a[0] - b[0], a[1] - b[1]);
+}
+
+function spawnPulse(x1, y1, x2, y2) {
+  pulses.push({ x1, y1, x2, y2, p: 0, speed: 0.018 + Math.random() * 0.014 });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  const outerPos = nodes.map(n => nodePos(n, t));
+  const innerPos = innerNodes.map(n => nodePos(n, t));
+  const allPos = [...outerPos, ...innerPos];
+
+  // center orb
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 38);
+  grad.addColorStop(0, isDark ? 'rgba(174,169,236,0.35)' : 'rgba(174,169,236,0.45)');
+  grad.addColorStop(1, 'rgba(127,119,221,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+  ctx.fillStyle = COL.node;
+  ctx.fill();
+
+  // draw connections between outer nodes
+  for (let i = 0; i < outerPos.length; i++) {
+    for (let j = i + 1; j < outerPos.length; j++) {
+      const d = dist(outerPos[i], outerPos[j]);
+      if (d < 130) {
+        const alpha = (1 - d / 130) * 0.35;
+        ctx.beginPath();
+        ctx.moveTo(outerPos[i][0], outerPos[i][1]);
+        ctx.lineTo(outerPos[j][0], outerPos[j][1]);
+        ctx.strokeStyle = COL.line.replace('VAL', alpha.toFixed(2));
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // inner to outer connections
+  for (let i = 0; i < innerPos.length; i++) {
+    const closest = outerPos.map((p, j) => ({ j, d: dist(innerPos[i], p) }))
+      .sort((a, b) => a.d - b.d).slice(0, 2);
+    for (const { j, d } of closest) {
+      const alpha = (1 - d / 200) * 0.45;
+      ctx.beginPath();
+      ctx.moveTo(innerPos[i][0], innerPos[i][1]);
+      ctx.lineTo(outerPos[j][0], outerPos[j][1]);
+      ctx.strokeStyle = COL.line.replace('VAL', Math.max(0, alpha).toFixed(2));
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+    }
+  }
+
+  // center to inner
+  for (const p of innerPos) {
+    const alpha = 0.3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(p[0], p[1]);
+    ctx.strokeStyle = COL.line.replace('VAL', alpha.toFixed(2));
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // pulse travel
+  pulseTimer++;
+  if (pulseTimer > 28) {
+    pulseTimer = 0;
+    const i = Math.floor(Math.random() * outerPos.length);
+    const j = Math.floor(Math.random() * innerPos.length);
+    if (Math.random() > 0.5) {
+      spawnPulse(outerPos[i][0], outerPos[i][1], innerPos[j][0], innerPos[j][1]);
+    } else {
+      const k = Math.floor(Math.random() * outerPos.length);
+      if (dist(outerPos[i], outerPos[k]) < 130) {
+        spawnPulse(outerPos[i][0], outerPos[i][1], outerPos[k][0], outerPos[k][1]);
+      }
+    }
+  }
+
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    const pu = pulses[i];
+    pu.p += pu.speed;
+    if (pu.p > 1) { pulses.splice(i, 1); continue; }
+    const px = pu.x1 + (pu.x2 - pu.x1) * pu.p;
+    const py = pu.y1 + (pu.y2 - pu.y1) * pu.p;
+    const fade = Math.sin(pu.p * Math.PI);
+    ctx.beginPath();
+    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = COL.pulse.replace('VAL', (fade * 0.9).toFixed(2));
+    ctx.fill();
+    // trail
+    for (let tr = 1; tr <= 3; tr++) {
+      const tp = Math.max(0, pu.p - tr * 0.04);
+      const tx = pu.x1 + (pu.x2 - pu.x1) * tp;
+      const ty = pu.y1 + (pu.y2 - pu.y1) * tp;
+      ctx.beginPath();
+      ctx.arc(tx, ty, 1.5 - tr * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = COL.pulse.replace('VAL', (fade * 0.3 / tr).toFixed(2));
+      ctx.fill();
+    }
+  }
+
+  // draw nodes
+  for (const p of allPos) {
+    // glow
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 7, 0, Math.PI * 2);
+    ctx.fillStyle = COL.nodeGlow;
+    ctx.fill();
+    // dot
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = COL.node;
+    ctx.fill();
+  }
+
+  // scanning ring
+  const scanR = 105 + Math.sin(t * 0.6) * 12;
+  ctx.beginPath();
+  ctx.arc(cx, cy, scanR, 0, Math.PI * 2);
+  ctx.strokeStyle = isDark ? 'rgba(93,202,165,0.08)' : 'rgba(29,158,117,0.07)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  t += 0.016;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>

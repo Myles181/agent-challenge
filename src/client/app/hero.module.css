@@ -1,9 +1,9 @@
 .heroContainer {
   min-height: 100vh;
-  background-color: #000103;
+  background-color: var(--theme-appBg);
   background-image: 
-    radial-gradient(circle at 50% 20%, rgba(255, 0, 0, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at bottom, rgba(220, 38, 38, 0.1) 0%, transparent 60%);
+    radial-gradient(circle at 50% 20%, rgba(var(--theme-primary-rgb), 0.05) 0%, transparent 50%),
+    radial-gradient(circle at bottom, rgba(var(--theme-primary-rgb), 0.1) 0%, transparent 60%);
   color: #fff;
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -65,9 +65,9 @@
 }
 
 .featureCard {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--theme-border);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--theme-border);
   padding: 2.5rem;
   border-radius: 24px;
   text-align: left;
@@ -77,24 +77,24 @@
 }
 
 .featureCard:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(220, 38, 38, 0.4);
+  background: var(--theme-border);
+  border-color: rgba(var(--theme-primary-rgb), 0.4);
   transform: translateY(-10px);
-  box-shadow: 0 10px 40px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 10px 40px rgba(var(--theme-primary-rgb), 0.1);
 }
 
 .featureIcon {
   width: 54px;
   height: 54px;
-  background: rgba(220, 38, 38, 0.15);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: rgba(var(--theme-primary-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
   font-size: 1.75rem;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.1);
 }
 
 .featureTitle {
@@ -111,9 +111,9 @@
 }
 
 .ctaSection {
-  background: radial-gradient(circle at center, rgba(220, 38, 38, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(var(--theme-primary-rgb), 0.12) 0%, transparent 70%);
   padding: 12rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--theme-border);
 }
 
 .ctaHeading {
@@ -128,7 +128,7 @@
 }
 
 .primaryButton {
-  background: #DC2626;
+  background: var(--theme-primary);
   color: #fff;
   padding: 1.125rem 3rem;
   border-radius: 9999px;
@@ -137,18 +137,19 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 0 40px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 40px rgba(var(--theme-primary-rgb), 0.3);
 }
 
 .primaryButton:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 60px rgba(220, 38, 38, 0.5);
-  background: #EF4444;
+  box-shadow: 0 0 60px rgba(var(--theme-primary-rgb), 0.5);
+  background: var(--theme-primary);
+  filter: brightness(1.2);
 }
 
 .footer {
   padding: 6rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--theme-border);
   background: rgba(0, 0, 0, 0.3);
 }
 
@@ -180,7 +181,7 @@
 }
 
 .footerCol a:hover {
-  color: #DC2626;
+  color: var(--theme-primary);
 }
 
 .navWrapper {
@@ -191,13 +192,20 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 2.5rem;
-  padding: 0.625rem 2rem;
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 1.5rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(40px) saturate(1.5);
+  border: 1px solid var(--theme-border);
   border-radius: 9999px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(var(--theme-primary-rgb), 0.05);
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
 }
 
 .navItem {
@@ -205,24 +213,48 @@
   font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  position: relative;
+  transition: color 0.3s;
+  z-index: 10;
 }
 
 .navItem:hover {
-  color: #DC2626;
+  color: #fff;
+}
+
+.navHoverBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--theme-primary-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
+  box-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.2);
+  border-radius: 9999px;
+  z-index: 0;
 }
 
 .navItemActive {
   color: #fff;
-  background: rgba(220, 38, 38, 0.2);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  padding: 0.4rem 1rem;
+  background: rgba(var(--theme-primary-rgb), 0.2);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
+  padding: 0.5rem 1.25rem;
   border-radius: 9999px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.navItemActive:hover {
+  background: rgba(var(--theme-primary-rgb), 0.3);
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.3);
 }
 
 .magicButton {
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: rgba(var(--theme-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
   font-size: 0.9375rem;
@@ -236,9 +268,9 @@
 }
 
 .magicButton:hover {
-  background: rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.5);
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  background: rgba(var(--theme-primary-rgb), 0.2);
+  border-color: rgba(var(--theme-primary-rgb), 0.5);
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.2);
 }
 
 .mainContent {
@@ -257,8 +289,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--theme-border);
+  border: 1px solid var(--theme-border);
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
   font-size: 0.8125rem;
@@ -292,13 +324,13 @@
 }
 
 .flowBadge {
-  background: radial-gradient(circle at center, rgba(220, 38, 38, 0.4) 0%, rgba(220, 38, 38, 0) 70%);
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: radial-gradient(circle at center, rgba(var(--theme-primary-rgb), 0.4) 0%, rgba(var(--theme-primary-rgb), 0) 70%);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.4);
   padding: 0.625rem 2rem;
   border-radius: 9999px;
   font-size: 1rem;
   font-weight: 700;
-  box-shadow: 0 0 30px rgba(220, 38, 38, 0.2);
+  box-shadow: 0 0 30px rgba(var(--theme-primary-rgb), 0.2);
   color: #fff;
 }
 
@@ -320,7 +352,7 @@
 
 .pulseCircle {
   fill: none;
-  stroke: #DC2626;
+  stroke: var(--theme-primary);
   stroke-width: 1;
   transform-origin: center;
   animation: pulseRadial 4s infinite;
@@ -331,13 +363,13 @@
   transform-origin: center;
   animation: rotate 60s linear infinite;
   fill: none;
-  stroke: rgba(220, 38, 38, 0.35);
+  stroke: rgba(var(--theme-primary-rgb), 0.35);
   stroke-width: 1.5;
   stroke-dasharray: 8 16;
 }
 
 .particle {
-  fill: #DC2626;
+  fill: var(--theme-primary);
   filter: blur(2px);
 }
 
@@ -346,12 +378,12 @@
   width: 44px;
   height: 44px;
   background: rgba(20, 20, 20, 0.6);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.2);
   transition: all 0.3s;
 }
 
@@ -380,7 +412,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--theme-appBg);
   backdrop-filter: blur(10px);
   z-index: 1000;
   display: flex;
@@ -389,14 +421,14 @@
 }
 
 .modalContent {
-  background: #0A0A0C;
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: var(--theme-panelBg);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
   padding: 3rem;
   border-radius: 32px;
   width: 100%;
   max-width: 440px;
   position: relative;
-  box-shadow: 0 0 60px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 60px rgba(var(--theme-primary-rgb), 0.15);
 }
 
 .walletList {
@@ -407,8 +439,8 @@
 }
 
 .walletOption {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--theme-border);
+  border: 1px solid var(--theme-border);
   padding: 1.25rem;
   border-radius: 16px;
   display: flex;
@@ -420,8 +452,8 @@
 }
 
 .walletOption:hover {
-  background: rgba(220, 38, 38, 0.1);
-  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(var(--theme-primary-rgb), 0.1);
+  border-color: rgba(var(--theme-primary-rgb), 0.3);
   transform: translateX(5px);
 }
 
