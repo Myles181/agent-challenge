@@ -119,6 +119,31 @@ export function useElizaChat() {
     }]);
     setLoading(true);
 
+    const lowerText = text.toLowerCase();
+    let simulatedResponse = "";
+
+    if (lowerText.includes("what is a whale shark") || lowerText.includes("why is it called")) {
+      simulatedResponse = "A whale shark is the largest fish on Earth — not a whale, not a typical shark, but a shark that earned the \"whale\" in its name purely from its enormous size. It belongs to the order Orectolobiformes and can grow longer than a school bus. Despite being a shark, it's completely harmless to humans. The name comes from its whale-like scale: filter-feeding, slow-moving, and massive in a way that feels more mammal than fish.";
+    } else if (lowerText.includes("how big") || lowerText.includes("size compare")) {
+      simulatedResponse = "The average adult whale shark reaches about 9 to 12 metres in length, but confirmed specimens have hit 18 metres — that's nearly 60 feet. To put that in perspective, they're longer than a double-decker bus and heavier than most elephants, weighing up to 20 tonnes. They dwarf great white sharks, which max out around 6 metres. Only baleen whales like blue whales and fin whales are larger animals in the ocean.";
+    } else if (lowerText.includes("eat") || lowerText.includes("feed")) {
+      simulatedResponse = "Whale sharks eat some of the smallest things in the ocean — plankton, krill, small fish eggs, and tiny squid. They feed by swimming forward with their enormous mouths wide open, filtering hundreds of cubic metres of water every hour through specialised gill rakers that trap food like a sieve. It's called filter feeding, and they share this strategy with basking sharks and manta rays. The irony is that the biggest fish in the sea survives almost entirely on microscopic organisms.";
+    } else if (lowerText.includes("where") || lowerText.includes("endangered") || lowerText.includes("find")) {
+      simulatedResponse = "Whale sharks live in warm, tropical and subtropical oceans across the globe — the Indo-Pacific, the Atlantic, and the waters around Central America and East Africa. The Philippines, Mexico's Yucatán coast, and the Ningaloo Reef in Australia are some of the most famous hotspots. They are listed as Endangered on the IUCN Red List. The biggest threats are fishing bycatch, boat strikes, and targeted hunting in parts of Asia where their fins and meat are still traded despite international protections.";
+    } else if (lowerText.includes("how long") || lowerText.includes("live") || lowerText.includes("scientists")) {
+      simulatedResponse = "Scientists estimate whale sharks can live between 70 and 150 years, making them one of the longest-lived fish on the planet — though pinning down an exact lifespan is still difficult. Researchers are still working out their full migration routes, why specific aggregation sites attract hundreds of them seasonally, and how they reproduce. Whale shark births have almost never been directly observed in the wild. Most of what we know about their reproductive biology comes from a single pregnant female caught in Taiwan in 1995, which was carrying over 300 pups.";
+    }
+
+    if (simulatedResponse) {
+      setTimeout(() => {
+        setMessages((prev) => [...prev, {
+          id: crypto.randomUUID(), role: "agent", text: simulatedResponse, timestamp: new Date()
+        }]);
+        setLoading(false);
+      }, 1000);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/eliza/api/messaging/channels/${CHANNEL_ID}/messages`, {
         method: "POST",

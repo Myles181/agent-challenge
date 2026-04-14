@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Cpu, Activity, Terminal, Zap, ShieldCheck, Globe } from "lucide-react";
 import { useElizaChat } from "../../../hooks/useElizaChat";
 
-import { ThemePreset } from "../page";
+import { ThemePreset } from "../../theme-engine";
 
 const IQ5Core = ({ isThinking, isConnected, isFocused, theme }: { isThinking: boolean; isConnected: boolean; isFocused: boolean; theme: ThemePreset }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -115,7 +115,7 @@ export default function ChatPanel({ isFocused, theme }: { isFocused: boolean; th
   }, [messages, loading]);
 
   const handleSend = () => {
-    if (!input.trim() || !connected || loading) return;
+    if (!input.trim() || loading) return;
     sendMessage(input);
     setInput("");
   };
@@ -174,12 +174,12 @@ export default function ChatPanel({ isFocused, theme }: { isFocused: boolean; th
           placeholder={isFocused ? "Execute command..." : "Core focused"}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          disabled={!isFocused || !connected || loading}
+          disabled={!isFocused || loading}
           style={{ flex: 1, background: "transparent", border: "none", color: theme.textMain, outline: "none", padding: "8px", fontSize: "0.9rem" }}
         />
         <button
           onClick={handleSend}
-          disabled={!isFocused || !input.trim() || !connected || loading}
+          disabled={!isFocused || !input.trim() || loading}
           style={{ 
             width: 36, height: 36, borderRadius: 10, 
             background: theme.primary, 

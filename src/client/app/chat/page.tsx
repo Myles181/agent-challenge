@@ -255,7 +255,7 @@ export default function ChatPage() {
   }, [messages, loading]);
 
   const handleSend = () => {
-    if (!input.trim() || !connected || loading) return;
+    if (!input.trim() || loading) return;
     sendMessage(input);
     setInput("");
   };
@@ -348,14 +348,14 @@ export default function ChatPage() {
                   placeholder={connected ? "Await operator command..." : "Initializing sequence..."}
                   className={styles.chatInput}
                   value={input}
-                  disabled={!connected || loading}
+                  disabled={loading}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                />
                <button 
                   className={styles.sendBtn} 
                   onClick={handleSend}
-                  disabled={!input.trim() || !connected || loading}
+                  disabled={!input.trim() || loading}
                >
                   <Send className="w-4 h-4" />
                </button>
